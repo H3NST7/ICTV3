@@ -1,5 +1,5 @@
 # ICT XAUUSD Master EA v5.02
-## Omnipotent Inner Circle Trader Implementation with Advanced Algorithmic Trading Architecture
+## Inner Circle Trader Implementation with Advanced Algorithmic Trading Architecture
 
 [![MetaTrader 5](https://img.shields.io/badge/MetaTrader-5-blue.svg)](https://www.metatrader5.com/)
 [![MQL5](https://img.shields.io/badge/MQL5-Compatible-green.svg)](https://www.mql5.com/)
