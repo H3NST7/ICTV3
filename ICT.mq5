@@ -1,10 +1,10 @@
 //+------------------------------------------------------------------+
-//|                                    ICT_XAUUSD_Master_EA.mq5    |
-//|                        Copyright 2025, h3nst7                  |
-//|                   Complete Omnipotent ICT Implementation v5.02 |
+//|                                    ICT_XAUUSD_Master_EA.mq5      |
+//|                     Copyright 2025, H2nst7 Trading Systems       |
+//|                   Complete Omnipotent ICT Implementation v5.02   |
 //+------------------------------------------------------------------+
-#property copyright "Copyright 2025, H3nst7"
-#property link      "https://innercircletrader.net"
+#property copyright "Copyright 2025, H3nst7 Trading Systems"
+#property link      "https://H3nst7.net"
 #property version   "5.02"
 #property description "Complete ICT Implementation for XAUUSD - All Concepts Integrated with Advanced Visualization"
 
@@ -619,7 +619,7 @@ void OnTick() {
     if(InpUseSilverBullet) ProcessSilverBulletSetups();
     ProcessVenomModel();
     
-    LogDebug("TRADING_CHECK", StringFormat("Trading allowed check - Current status being evaluated"));
+    LogDebug("TRADING_CHECK", "Trading allowed check - Current status being evaluated");
     
     if(IsTradingAllowed()) {
         LogDebug("TRADING", "Trading conditions met - Processing setups");
@@ -693,7 +693,7 @@ bool InitializeSymbol() {
     }
     
     LogDebug("SYMBOL", StringFormat("Symbol initialized: %s, Point: %.5f, Digits: %d", 
-                                   _Symbol, g_symbol.Point(), g_symbol.Digits()));
+                                   _Symbol, g_symbol.Point(), (int)g_symbol.Digits()));
     
     return true;
 }
@@ -752,7 +752,7 @@ bool ValidateInputsEnhanced() {
 }
 
 bool InitializeTradingObjects() {
-    g_trade.SetExpertMagicNumber(InpMagicNumber);
+    g_trade.SetExpertMagicNumber((ulong)InpMagicNumber);
     g_trade.SetDeviationInPoints(20);
     g_trade.SetTypeFilling(ORDER_FILLING_IOC);
     
@@ -973,7 +973,7 @@ void ConfigureXAUUSDSettings() {
     
     double tick_size = g_symbol.TickSize();
     double tick_value = g_symbol.TickValue();
-    int digits = g_symbol.Digits();
+    int digits = (int)g_symbol.Digits();
     
     LogDebug("SYMBOL", StringFormat("Symbol configuration: Tick size=%.5f, Tick value=%.2f, Digits=%d", 
                                    tick_size, tick_value, digits));
@@ -1938,7 +1938,7 @@ void ExecuteICTTrade(const ICTPattern& pattern) {
     }
     
     // Check broker constraints
-    double min_stop_level_points = SymbolInfoInteger(_Symbol, SYMBOL_TRADE_STOPS_LEVEL);
+    double min_stop_level_points = (double)SymbolInfoInteger(_Symbol, SYMBOL_TRADE_STOPS_LEVEL);
     double min_distance = min_stop_level_points * _Point;
     
     if(pattern.direction == BIAS_BULLISH) {
@@ -1972,7 +1972,7 @@ void ExecuteICTTrade(const ICTPattern& pattern) {
             for(int pos = PositionsTotal() - 1; pos >= 0; pos--) {
                 if(g_position.SelectByIndex(pos) && 
                    g_position.Symbol() == _Symbol && 
-                   g_position.Magic() == InpMagicNumber) {
+                   g_position.Magic() == (ulong)InpMagicNumber) {
                     position_ticket = g_position.Ticket();
                     break;
                 }
@@ -1994,12 +1994,12 @@ void ExecuteICTTrade(const ICTPattern& pattern) {
         
         LogCriticalEvent("TRADE_EXECUTED", 
                         StringFormat("%s executed: Entry=%.5f, SL=%.5f, TP=%.5f, Volume=%.2f, Ticket=%lld", 
-                                   comment, entry_price, stop_loss, take_profit, lot_size, position_ticket));
+                                   comment, entry_price, stop_loss, take_profit, lot_size, (long)position_ticket));
     } else {
-        HandleCriticalError(g_trade.ResultRetcode());
+        HandleCriticalError((int)g_trade.ResultRetcode());
         LogCriticalEvent("TRADE_ERROR", 
                         StringFormat("Trade execution failed - Code: %d, Description: %s", 
-                                   g_trade.ResultRetcode(), g_trade.ResultComment()));
+                                   (int)g_trade.ResultRetcode(), g_trade.ResultComment()));
     }
 }
 
@@ -2039,7 +2039,7 @@ double CalculateStopLoss(const ICTPattern& pattern) {
                        g_symbol.Ask() + (atr * 2);
     }
     
-    return NormalizeDouble(stop_loss, g_symbol.Digits());
+    return NormalizeDouble(stop_loss, (int)g_symbol.Digits());
 }
 
 double CalculateTakeProfit(const ICTPattern& pattern, double entry_price) {
@@ -2061,7 +2061,7 @@ double CalculateTakeProfit(const ICTPattern& pattern, double entry_price) {
     
     double optimal_target = FindOptimalTarget(pattern, entry_price, reward);
     
-    return NormalizeDouble(optimal_target, g_symbol.Digits());
+    return NormalizeDouble(optimal_target, (int)g_symbol.Digits());
 }
 
 double CalculateLotSize(double entry_price, double stop_loss) {
@@ -2100,7 +2100,7 @@ double CalculateLotSize(double entry_price, double stop_loss) {
 void ManagePositions() {
     for(int i = PositionsTotal() - 1; i >= 0; i--) {
         if(!g_position.SelectByIndex(i)) continue;
-        if(g_position.Magic() != InpMagicNumber) continue;
+        if(g_position.Magic() != (ulong)InpMagicNumber) continue;
         
         ulong ticket = g_position.Ticket();
         
@@ -2126,7 +2126,7 @@ void ManagePositions() {
                     if(MoveToBE(ticket, entry_price)) {
                         g_active_trades[trade_info_index].state = TRADE_STATE_BREAKEVEN;
                         LogCriticalEvent("TRADE_MANAGEMENT", 
-                                       StringFormat("Position %lld moved to breakeven", ticket));
+                                       StringFormat("Position %lld moved to breakeven", (long)ticket));
                     }
                 }
                 break;
@@ -2136,7 +2136,7 @@ void ManagePositions() {
                     if(TakePartialProfit(ticket, 0.3)) {
                         g_active_trades[trade_info_index].state = TRADE_STATE_PARTIAL_1;
                         LogCriticalEvent("TRADE_MANAGEMENT", 
-                                       StringFormat("First partial taken on %lld", ticket));
+                                       StringFormat("First partial taken on %lld", (long)ticket));
                     }
                 }
                 break;
@@ -2146,7 +2146,7 @@ void ManagePositions() {
                     if(TakePartialProfit(ticket, 0.3)) {
                         g_active_trades[trade_info_index].state = TRADE_STATE_PARTIAL_2;
                         LogCriticalEvent("TRADE_MANAGEMENT", 
-                                       StringFormat("Second partial taken on %lld", ticket));
+                                       StringFormat("Second partial taken on %lld", (long)ticket));
                     }
                 }
                 break;
@@ -2156,7 +2156,7 @@ void ManagePositions() {
                     if(StartTrailingStop(ticket)) {
                         g_active_trades[trade_info_index].state = TRADE_STATE_TRAILING;
                         LogCriticalEvent("TRADE_MANAGEMENT", 
-                                       StringFormat("Trailing stop activated on %lld", ticket));
+                                       StringFormat("Trailing stop activated on %lld", (long)ticket));
                     }
                 }
                 break;
@@ -2382,19 +2382,21 @@ bool IsOptimalEntry(int pattern_index) {
     
     switch(pattern.type) {
         case SETUP_FVG:
-        case SETUP_OB:
+        case SETUP_OB: {
             bool in_range = current_price >= pattern.low && current_price <= pattern.high;
             LogDebug("ENTRY_CHECK", StringFormat("Pattern %d entry check - Price: %.5f, Range: %.5f-%.5f, In range: %s", 
                                                  pattern_index, current_price, pattern.low, pattern.high, 
                                                  in_range ? "YES" : "NO"));
             return in_range;
+        }
             
-        case SETUP_LIQUIDITY:
+        case SETUP_LIQUIDITY: {
             bool near_level = MathAbs(current_price - pattern.high) < 10 * _Point ||
                              MathAbs(current_price - pattern.low) < 10 * _Point;
             LogDebug("ENTRY_CHECK", StringFormat("Pattern %d liquidity proximity check: %s", 
                                                  pattern_index, near_level ? "YES" : "NO"));
             return near_level;
+        }
             
         default:
             return true;
@@ -2440,7 +2442,7 @@ ulong GetPositionTicketFromDeal(ulong deal_ticket) {
     
     if(!HistoryDealSelect(deal_ticket)) {
         LogCriticalEvent("DEAL_ERROR", 
-                        StringFormat("Failed to select deal ticket %lld from history", deal_ticket));
+                        StringFormat("Failed to select deal ticket %lld from history", (long)deal_ticket));
         return 0;
     }
     
@@ -2448,20 +2450,20 @@ ulong GetPositionTicketFromDeal(ulong deal_ticket) {
     
     if(position_id == 0) {
         LogCriticalEvent("DEAL_ERROR", 
-                        StringFormat("Deal %lld contains invalid position ID", deal_ticket));
+                        StringFormat("Deal %lld contains invalid position ID", (long)deal_ticket));
         return 0;
     }
     
     if(PositionSelectByTicket(position_id)) {
         LogCriticalEvent("POSITION_MAPPING", 
                         StringFormat("Successfully mapped deal %lld to position %lld", 
-                                   deal_ticket, position_id));
+                                   (long)deal_ticket, (long)position_id));
         return position_id;
     }
     
     LogCriticalEvent("POSITION_WARNING", 
                     StringFormat("Position %lld from deal %lld not found in active positions", 
-                               position_id, deal_ticket));
+                               (long)position_id, (long)deal_ticket));
     return position_id;
 }
 
@@ -3820,7 +3822,7 @@ void GeneratePerformanceReport() {
 void CloseAllPositions() {
     for(int i = PositionsTotal() - 1; i >= 0; i--) {
         if(g_position.SelectByIndex(i)) {
-            if(g_position.Magic() == InpMagicNumber) {
+            if(g_position.Magic() == (ulong)InpMagicNumber) {
                 g_trade.PositionClose(g_position.Ticket());
             }
         }
@@ -3853,8 +3855,8 @@ void DrawChartObjects() {
 
 void DrawFVGObjects() {
     // Remove old FVG objects
-    for(int i = ObjectsTotal() - 1; i >= 0; i--) {
-        string obj_name = ObjectName(i);
+    for(int i = ObjectsTotal(0, -1, -1) - 1; i >= 0; i--) {
+        string obj_name = ObjectName(0, i, -1, -1);
         if(StringFind(obj_name, OBJ_PREFIX_FVG) == 0) {
             ObjectDelete(0, obj_name);
         }
@@ -3863,7 +3865,7 @@ void DrawFVGObjects() {
     for(int i = 0; i < g_pattern_count; i++) {
         if(g_patterns[i].type != SETUP_FVG || !g_patterns[i].valid) continue;
         
-        string obj_name = StringFormat("%s%d_%lld", OBJ_PREFIX_FVG, i, g_patterns[i].time);
+        string obj_name = StringFormat("%s%d_%lld", OBJ_PREFIX_FVG, i, (long)g_patterns[i].time);
         
         color fvg_color = g_patterns[i].direction == BIAS_BULLISH ? InpFVGBullishColor : InpFVGBearishColor;
         if(g_patterns[i].tested) {
@@ -3909,8 +3911,8 @@ void DrawFVGObjects() {
 
 void DrawOrderBlockObjects() {
     // Remove old OB objects
-    for(int i = ObjectsTotal() - 1; i >= 0; i--) {
-        string obj_name = ObjectName(i);
+    for(int i = ObjectsTotal(0, -1, -1) - 1; i >= 0; i--) {
+        string obj_name = ObjectName(0, i, -1, -1);
         if(StringFind(obj_name, OBJ_PREFIX_OB) == 0) {
             ObjectDelete(0, obj_name);
         }
@@ -3919,7 +3921,7 @@ void DrawOrderBlockObjects() {
     for(int i = 0; i < g_pattern_count; i++) {
         if(g_patterns[i].type != SETUP_OB || !g_patterns[i].valid) continue;
         
-        string obj_name = StringFormat("%s%d_%lld", OBJ_PREFIX_OB, i, g_patterns[i].time);
+        string obj_name = StringFormat("%s%d_%lld", OBJ_PREFIX_OB, i, (long)g_patterns[i].time);
         
         color ob_color = g_patterns[i].direction == BIAS_BULLISH ? InpOBBullishColor : InpOBBearishColor;
         if(g_patterns[i].tested) {
@@ -3966,8 +3968,8 @@ void DrawOrderBlockObjects() {
 
 void DrawLiquidityObjects() {
     // Remove old liquidity objects
-    for(int i = ObjectsTotal() - 1; i >= 0; i--) {
-        string obj_name = ObjectName(i);
+    for(int i = ObjectsTotal(0, -1, -1) - 1; i >= 0; i--) {
+        string obj_name = ObjectName(0, i, -1, -1);
         if(StringFind(obj_name, OBJ_PREFIX_LIQ) == 0) {
             ObjectDelete(0, obj_name);
         }
@@ -4004,8 +4006,8 @@ void DrawLiquidityObjects() {
 
 void DrawSessionObjects() {
     // Remove old session objects
-    for(int i = ObjectsTotal() - 1; i >= 0; i--) {
-        string obj_name = ObjectName(i);
+    for(int i = ObjectsTotal(0, -1, -1) - 1; i >= 0; i--) {
+        string obj_name = ObjectName(0, i, -1, -1);
         if(StringFind(obj_name, OBJ_PREFIX_SESSION) == 0) {
             ObjectDelete(0, obj_name);
         }
@@ -4076,15 +4078,15 @@ void DrawSessionObjects() {
 
 void DrawMarketStructureObjects() {
     // Remove old market structure objects
-    for(int i = ObjectsTotal() - 1; i >= 0; i--) {
-        string obj_name = ObjectName(i);
+    for(int i = ObjectsTotal(0, -1, -1) - 1; i >= 0; i--) {
+        string obj_name = ObjectName(0, i, -1, -1);
         if(StringFind(obj_name, OBJ_PREFIX_MS) == 0) {
             ObjectDelete(0, obj_name);
         }
     }
     
     for(int i = 0; i < g_market_structure_count; i++) {
-        string obj_name = StringFormat("%s%d_%lld", OBJ_PREFIX_MS, i, g_market_structure[i].time);
+        string obj_name = StringFormat("%s%d_%lld", OBJ_PREFIX_MS, i, (long)g_market_structure[i].time);
         
         color ms_color = clrWhite;
         string symbol_text = "";
@@ -4140,8 +4142,8 @@ void DrawMarketStructureObjects() {
 
 void DrawIPDAObjects() {
     // Remove old IPDA objects
-    for(int i = ObjectsTotal() - 1; i >= 0; i--) {
-        string obj_name = ObjectName(i);
+    for(int i = ObjectsTotal(0, -1, -1) - 1; i >= 0; i--) {
+        string obj_name = ObjectName(0, i, -1, -1);
         if(StringFind(obj_name, OBJ_PREFIX_IPDA) == 0) {
             ObjectDelete(0, obj_name);
         }
@@ -4177,8 +4179,8 @@ void DrawIPDAObjects() {
 
 void DrawPowerOf3Objects() {
     // Remove old Power of 3 objects
-    for(int i = ObjectsTotal() - 1; i >= 0; i--) {
-        string obj_name = ObjectName(i);
+    for(int i = ObjectsTotal(0, -1, -1) - 1; i >= 0; i--) {
+        string obj_name = ObjectName(0, i, -1, -1);
         if(StringFind(obj_name, OBJ_PREFIX_PO3) == 0) {
             ObjectDelete(0, obj_name);
         }
@@ -4240,8 +4242,8 @@ void DrawPowerOf3Objects() {
 
 void DrawTradeObjects() {
     // Remove old trade objects
-    for(int i = ObjectsTotal() - 1; i >= 0; i--) {
-        string obj_name = ObjectName(i);
+    for(int i = ObjectsTotal(0, -1, -1) - 1; i >= 0; i--) {
+        string obj_name = ObjectName(0, i, -1, -1);
         if(StringFind(obj_name, OBJ_PREFIX_TRADE) == 0) {
             ObjectDelete(0, obj_name);
         }
@@ -4250,7 +4252,7 @@ void DrawTradeObjects() {
     for(int i = 0; i < g_active_trades_count; i++) {
         if(!g_position.SelectByTicket(g_active_trades[i].ticket)) continue;
         
-        string obj_name = StringFormat("%s%lld", OBJ_PREFIX_TRADE, g_active_trades[i].ticket);
+        string obj_name = StringFormat("%s%lld", OBJ_PREFIX_TRADE, (long)g_active_trades[i].ticket);
         
         // Draw entry level
         if(ObjectCreate(0, obj_name + "_entry", OBJ_HLINE, 0, 0, g_active_trades[i].entry_price)) {
@@ -4294,8 +4296,8 @@ void DrawTradeObjects() {
 
 void DrawGapObjects() {
     // Remove old gap objects
-    for(int i = ObjectsTotal() - 1; i >= 0; i--) {
-        string obj_name = ObjectName(i);
+    for(int i = ObjectsTotal(0, -1, -1) - 1; i >= 0; i--) {
+        string obj_name = ObjectName(0, i, -1, -1);
         if(StringFind(obj_name, OBJ_PREFIX_GAP) == 0) {
             ObjectDelete(0, obj_name);
         }
@@ -4304,7 +4306,7 @@ void DrawGapObjects() {
     for(int i = 0; i < g_gap_count; i++) {
         if(g_gaps[i].filled) continue;
         
-        string obj_name = StringFormat("%s%d_%lld", OBJ_PREFIX_GAP, i, g_gaps[i].formation_time);
+        string obj_name = StringFormat("%s%d_%lld", OBJ_PREFIX_GAP, i, (long)g_gaps[i].formation_time);
         string gap_type = g_gaps[i].is_ndog ? "NDOG" : "NWOG";
         
         // Draw gap zone
@@ -4338,8 +4340,8 @@ void DrawGapObjects() {
 
 void UpdateInformationPanel() {
     // Remove old info panel
-    for(int i = ObjectsTotal() - 1; i >= 0; i--) {
-        string obj_name = ObjectName(i);
+    for(int i = ObjectsTotal(0, -1, -1) - 1; i >= 0; i--) {
+        string obj_name = ObjectName(0, i, -1, -1);
         if(StringFind(obj_name, OBJ_PREFIX_INFO) == 0) {
             ObjectDelete(0, obj_name);
         }
@@ -4413,8 +4415,8 @@ void UpdateInformationPanel() {
 }
 
 void DeleteAllEAObjects() {
-    for(int i = ObjectsTotal() - 1; i >= 0; i--) {
-        string obj_name = ObjectName(i);
+    for(int i = ObjectsTotal(0, -1, -1) - 1; i >= 0; i--) {
+        string obj_name = ObjectName(0, i, -1, -1);
         if(StringFind(obj_name, "ICT_") == 0) {
             ObjectDelete(0, obj_name);
         }
