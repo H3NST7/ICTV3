@@ -1,9 +1,9 @@
 //+------------------------------------------------------------------+
 //|                                    ICT_XAUUSD_Master_EA.mq5    |
-//|                        Copyright 2025, ICT Trading Systems     |
+//|                        Copyright 2025, h3nst7                  |
 //|                   Complete Omnipotent ICT Implementation v5.02 |
 //+------------------------------------------------------------------+
-#property copyright "Copyright 2025, ICT Trading Systems"
+#property copyright "Copyright 2025, H3nst7"
 #property link      "https://innercircletrader.net"
 #property version   "5.02"
 #property description "Complete ICT Implementation for XAUUSD - All Concepts Integrated with Advanced Visualization"
